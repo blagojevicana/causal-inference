@@ -1,1 +1,154 @@
 # causal-inference
+
+### 1. Introduction
+
+Image the following scenario: A company randomly sent out different types of promotional emails to customers. Through A/B testing, they concluded that sending the email increased sales. But, can they be sure customers made the purchase only because of the email? Will they get the same results in the future?
+
+This is why causal inference is important. By looking at causal effect of sending the email on purchase sales, the company can find out whether the sales went up from sending the email only.
+
+### 2. Dataset
+
+This dataset is the famous marketing experiment from Kevin Hillstrom. It is commonly called the "Mine That Data Email Analytics Challenge".
+
+| |recency	|history_segment	|history|	mens	|womens|	zip_code|	newbie	|channel|	segment	|visit|	conversion|	spend|
+|---| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|0	|10	|2)  100− 200|	142.44	|1|	0	|Surburban|	0|	Phone|	Womens E-Mail|	0|	0	|0.0|
+|1|	6	|3)  200−350|	329.08	|1|	1|	Rural	|1	|Web|	No E-Mail|	0	|0	|0.0|
+|2|	7	|2)  100−200	|180.65|	0	|1|	Surburban|	1|	Web	|Womens E-Mail	|0	|0|	0.0|
+|3	|9|	5)  500−750	|675.83|	1|	0|	Rural	|1|	Web	|Mens E-Mail	|0|	0	|0.0|
+|...	|...|	...|...|	...|	...|	...|...|	...	|...	|...|	...	|...|
+|6400	|2|	1)  0−100	|45.34|	1|	0|	Urban|	0|	Web	|Womens E-Mail	|0|	0	|0.0|
+
+The columns include following features: recency (how recently they purchased), history (how much they spent before), whether they previously bought men’s or women’s items, their zip code type, whether they are new customers, which marketing channel they use, which email segment they were assigned to, whether they visited the site, whether they converted, and how much they spent. 
+
+The "segment" feature is what we are looking for, we want to see if it is a cause to increase in spending/conversion.
+
+### 3. Validate dataset
+
+Before doing anything with the dataset, we have to make sure that it is valid data. We can do this by looking at the histograms, to try and see if the are any weird datapoints, or outliers.
+
+![Figure_1](figures/Figure_1.png)
+
+We should also check information about the dataset, to remove any null values from the dataset.
+
+|	recency	|history_segment|	history|	mens	|womens	|zip_code|	newbie|	channel|	segment|	visit	|conversion|	spend|
+|---|---|---|---|---|---|---|---|---|---|---|---|
+|count|	64000.000000	|64000	|64000.000000	|64000.000000	|64000.000000	|64000	|64000.000000|	64000|	64000|	64000.000000|	64000.000000	|64000.000000
+unique|	NaN|	7	|NaN	|NaN|	NaN	|3|	NaN|	3|	3|	NaN	|NaN|	NaN
+top|	NaN|	1)  0− 100	|NaN	|NaN|	NaN	|Surburban|	NaN	|Web|	Womens E-Mail|	NaN|	NaN|	NaN
+freq|	NaN	|22970|	NaN	|NaN|	NaN	|28776|	NaN	|28217|	21387	|NaN|	NaN|	NaN
+mean|	5.763734|	NaN	|242.085656|	0.551031|	0.549719	|NaN	|0.502250	|NaN|	NaN	|0.146781	|0.009031|	1.050908
+std	|3.507592|	NaN|	256.158608	|0.497393	|0.497526	|NaN|	0.499999	|NaN	|NaN	|0.353890|	0.094604|	15.036448
+min	|1.000000	|NaN	|29.990000	|0.000000|	0.000000	|NaN|	0.000000	|NaN	|NaN	|0.000000	|0.000000|	0.000000
+25%	|2.000000	|NaN	|64.660000	|0.000000	|0.000000	|NaN	|0.000000	|NaN	|NaN	|0.000000	|0.000000	|0.000000
+50%	|6.000000	|NaN	|158.110000	|1.000000	|1.000000	|NaN	|1.000000	|NaN	|NaN	|0.000000	|0.000000	|0.000000
+75%	|9.000000	|NaN	|325.657500	|1.000000	|1.000000	|NaN	|1.000000	|NaN	|NaN	|0.000000	|0.000000	|0.000000
+max	|12.000000|	NaN	|3345.930000|	1.000000	|1.000000|	NaN	|1.000000	|NaN	|NaN|	1.000000	|1.000000|	499.000000
+
+| |  Column       |    Non-Null Count|  Dtype  
+--- | ------       |    -------------- | -----  
+ 0   |recency        |  64000 non-null | int64  
+ 1   |history_segment|  64000 non-null  |object 
+ 2   |history      |    64000 non-null  |float64
+ 3   |mens        |     64000 non-null  |int64  
+ 4   |womens      |     64000 non-null  |int64  
+ 5   |zip_code    |     64000 non-null  |object 
+ 6   |newbie      |     64000 non-null  |int64  
+ 7   |channel     |     64000 non-null  |object 
+ 8   |segment     |     64000 non-null  |object 
+ 9   |visit       |     64000 non-null  |int64  
+ 10  |conversion |      64000 non-null  |int64  
+ 11  |spend |           64000 non-null  |float64
+
+### 4. Causal-Inference-Oriented Exploratory Data Analysis (EDA)
+
+If we want to see if some variable is a direct cause to an outcome, we need to hold all the other variabels fixed, and only change that desired variable. So in this case, we will only change "segment" variable (*No Email*, *Womens Email*, *Mens Email*) and call it **treatment**, and everything else is considered fixed and is called **covariates**.
+
+In Causal Inference, we have to make some assumptions for causality, because past data probably isn't randomized enough:
+1. Causal Markov Condition - the causal graph for this system simply looks like this:
+
+![Picture1](pictures/Picture1.png)
+
+2. SUTVA (Stable Unit Treatment Value Assumption) - a sample in the control group doesn't affect the samples in the treatment group, we can consider this as true, if we assume customers don't talk to each other about the emails they get.
+
+3. Ignorability - we assume we know all covariates
+
+We will check the average value of every covariate in different treatment group.
+
+|   | recency |    history  |    mens |   womens   | newbie
+|---|---|---|---|---|---|
+|T=0|  5.749695 | 240.882653 | 0.553224  |0.547639 | 0.501971
+T=1 | 5.767850|  242.536633 | 0.548932 | 0.550101 | 0.503250
+T=2 | 5.773642  |242.835931|  0.550946 | 0.551415|  0.501525
+
+Since they are very similar, we can conclude that it was a properly randomized experiment, and there was no systematic bias.
+
+Next, we check if there is a relationship between covariates and treatment. If the dataset was perfectly randomized when sending an email, there would be no relationship between covariates and treatment. But, it is hardly likely past data was perfectly randomized, so we need to check differences in covariates in different treatment groups (here: what is the difference between people who received *No Email*, *Womens Email* and *Mens Email*?). This is used to prevent bias.
+
+We do this by training a logistic regression. If we can predict treatment by only looking at covariates, it means it wasn't a properly randomized experiment, and we need to account for that. Here are the results:
+
+```yaml
+Optimization terminated successfully.
+         Current function value: 1.098579
+         Iterations 3
+                          MNLogit Regression Results                          
+==============================================================================
+Dep. Variable:                      T   No. Observations:                64000
+Model:                        MNLogit   Df Residuals:                    63988
+Method:                           MLE   Df Model:                           10
+Date:                Thu, 20 Nov 2025   Pseudo R-squ.:               2.874e-05
+Time:                        22:55:12   Log-Likelihood:                -70309.
+converged:                       True   LL-Null:                       -70311.
+Covariance Type:            nonrobust   LLR p-value:                    0.9455
+==============================================================================
+       T=1       coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      0.0163      0.042      0.383      0.701      -0.067       0.099
+recency        0.0020      0.003      0.716      0.474      -0.004       0.008
+history     4.575e-05   4.29e-05      1.067      0.286   -3.83e-05       0.000
+mens          -0.0404      0.036     -1.115      0.265      -0.112       0.031
+womens        -0.0255      0.036     -0.702      0.482      -0.097       0.046
+newbie         0.0020      0.020      0.102      0.919      -0.037       0.041
+------------------------------------------------------------------------------
+       T=2       coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     -0.0303      0.042     -0.716      0.474      -0.113       0.053
+recency        0.0026      0.003      0.927      0.354      -0.003       0.008
+history      3.76e-05    4.3e-05      0.875      0.381   -4.66e-05       0.000
+mens           0.0012      0.036      0.035      0.972      -0.070       0.072
+womens         0.0147      0.036      0.406      0.685      -0.056       0.085
+newbie        -0.0054      0.020     -0.274      0.784      -0.044       0.034
+==============================================================================
+```
+
+The regression results show very high p-values and extremely small pseudo R-squared.That means treatment assignment is basically random with respect to those covariates.This confirms randomization worked.
+
+Then another logistic regression is run, this time predicting Y (conversion) using covariates.This model shows which characteristics predict conversion.For example, recency has a negative coefficient. That means customers who purchased recently are less likely to convert again in this period. History has a positive coefficient. Customers who historically spent more are more likely to convert.This regression is descriptive. It is not causal yet. It just shows correlations between characteristics and outcome.
+
+### 5. Causal Machine Learning
+
+Two random forest models are defined.One is a classifier to estimate the propensity score. The propensity score is the probability of receiving treatment given covariates.The other is a regressor to estimate the outcome model. That means predicting conversion based on covariates and treatment.Then DRLearner is created.DRLearner stands for Doubly Robust Learner.It works like this.First, it estimates how treatment depends on covariates (propensity model).Second, it estimates how outcome depends on covariates and treatment (outcome model).Then it combines them in a special way that removes bias if at least one of those models is correctly specified.The “double robustness” means that even if one model is wrong, the causal estimate can still be correct as long as the other is correct.This method also uses cross-fitting. That means it splits the data, trains models on part of it, and evaluates on other parts. This prevents overfitting from contaminating the causal estimate.
+
+After fitting, the learner can estimate treatment effects.
+
+For each customer, what is the estimated difference in probability of conversion between Womens E-Mail and No E-Mail? It computes an individual treatment effect for each person. That is called CATE (Conditional Average Treatment Effect).Then taking .mean() averages those individual effects. That gives the ATE (Average Treatment Effect).The result for Womens vs No Email is about 0.00324.That means sending the women’s email increases probability of conversion by 0.324 percentage points.For Mens vs No Email, the effect is 0.0068.That means a 0.68 percentage point increase.
+
+Next, histograms are plotted of the CATE distribution.It shows that treatment effects are not identical for everyone.Some customers benefit more. Some benefit less. Some might even have negative effect.The red dashed line marks the average effect.The width of the histogram shows heterogeneity.
+
+Then bootstrap validation is performed.Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean.Doing this 1000 times creates a distribution of possible ATE values.The 2.5th and 97.5th percentiles give a 95% confidence interval.For Womens email, the interval is approximately [0.003207, 0.003281].Since zero is not inside that interval, the effect is statistically significant.The same is done for Mens email.
+
+Now comes the placebo test.The outcome Y is randomly shuffled.That destroys any real relationship between treatment and outcome.Then the DRLearner is fit again.If the method is valid, the estimated ATE should now be near zero.And it is.That shows the model is not just hallucinating effects.
+
+### 6. Conclusion
+
+Mens email has a larger causal effect than Womens email.Both are statistically significant.The placebo confirms the method does not invent effects.The covariate balance confirms randomization.
+
+The experiment was randomized.
+Groups are balanced.
+We estimated causal effects using a doubly robust machine learning method.
+Both email types increase conversion.
+Mens email increases conversion more.
+
+
+
+
