@@ -67,7 +67,7 @@ If we want to see if some variable is a direct cause to an outcome, we need to h
 In Causal Inference, we have to make some assumptions for causality, because past data probably isn't randomized enough:
 1. Causal Markov Condition - the causal graph for this system simply looks like this:
 
-![Picture1](pictures/Picture1.png)
+![Picture1](images/Picture1.png)
 
 2. SUTVA (Stable Unit Treatment Value Assumption) - a sample in the control group doesn't affect the samples in the treatment group, we can consider this as true, if we assume customers don't talk to each other about the emails they get.
 
@@ -121,9 +121,38 @@ newbie        -0.0054      0.020     -0.274      0.784      -0.044       0.034
 ==============================================================================
 ```
 
-The regression results show very high p-values and extremely small pseudo R-squared.That means treatment assignment is basically random with respect to those covariates.This confirms randomization worked.
+The regression results show very high p-values and extremely small pseudo R-squared. This confirms randomization worked.
 
-Then another logistic regression is run, this time predicting Y (conversion) using covariates.This model shows which characteristics predict conversion.For example, recency has a negative coefficient. That means customers who purchased recently are less likely to convert again in this period. History has a positive coefficient. Customers who historically spent more are more likely to convert.This regression is descriptive. It is not causal yet. It just shows correlations between characteristics and outcome.
+We can also run another logistic regression, this time predicting outcome (conversion) using covariates. This model shows which characteristics predict conversion. Here are the results:
+
+```yaml
+Optimization terminated successfully.
+         Current function value: 0.050684
+         Iterations 9
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                      Y   No. Observations:                64000
+Model:                          Logit   Df Residuals:                    63994
+Method:                           MLE   Df Model:                            5
+Date:                Thu, 20 Nov 2025   Pseudo R-squ.:                 0.01586
+Time:                        22:55:12   Log-Likelihood:                -3243.8
+converged:                       True   LL-Null:                       -3296.1
+Covariance Type:            nonrobust   LLR p-value:                 5.829e-21
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     -4.8805      0.157    -30.993      0.000      -5.189      -4.572
+recency       -0.0592      0.013     -4.615      0.000      -0.084      -0.034
+history        0.0008      0.000      5.189      0.000       0.000       0.001
+mens           0.3643      0.126      2.883      0.004       0.117       0.612
+womens         0.4948      0.129      3.848      0.000       0.243       0.747
+newbie        -0.4352      0.091     -4.808      0.000      -0.613      -0.258
+==============================================================================
+```
+
+We can see that recency has a negative coefficient. That means customers who purchased recently are less likely to convert again in this period. History has a positive coefficient. Customers who historically spent more are more likely to convert. 
+
+*Note: This regression is just descriptive, it is not causal yet, it just shows correlations between characteristics and outcome.*
 
 ### 5. Causal Machine Learning
 
