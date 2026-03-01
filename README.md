@@ -193,10 +193,10 @@ Now we need to estimate uncertainty around causal effect. Are we certain that th
 
 Hypothesis tetsing works by first setting up the hypotheses:
 
-H0: ATE = 0 (sending the email does nothing)
-H1: ATE ≠ 0 (sending the email does something)
+- H0: ATE = 0 (sending the email does nothing)
+- H1: ATE ≠ 0 (sending the email does something)
 
-It is possible that sending the email something does something, but very rarely, in which case we would not have enough evidence to say H0 is false. We have to make sure that H1 is happening often enough that we can reject H0. We do this by calculating the **p-value**: *If H0 is true, how suprising is our data?*
+It is possible that sending the email does something, but very rarely, in which case we would not have enough evidence to say H0 is false. We have to make sure that H1 is happening often enough that we can reject H0. We do this by calculating the **p-value**: *If H0 is true, how suprising is our data?*
 
 Since we only have one dataset, we will simulate different samples by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. The 2.5th and 97.5th percentiles give a 95% confidence interval.
 
