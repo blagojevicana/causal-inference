@@ -198,7 +198,7 @@ Hypothesis tetsing works by first setting up the hypotheses:
 
 It is possible that sending the email does something, but very rarely, in which case we would not have enough evidence to say H0 is false. We have to make sure that H1 is happening often enough that we can reject H0. We do this by calculating the **p-value**: *If H0 is true, how suprising is our data?*
 
-Since we only have one dataset, we will simulate different samples by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. The 2.5th and 97.5th percentiles give a 95% confidence interval.
+Since we only have one dataset, we will simulate different samples by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. Since we are using two-sided hypothesis, p-value is twice as big as in one-sided hypothesis, so we will use confidence intervals. The 2.5th and 97.5th percentiles give a 95% confidence interval.
 
 0 is outside the 95% confidence interval ⇔ p-value < 0.05
 
