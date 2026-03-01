@@ -31,8 +31,8 @@ Before doing anything with the dataset, we have to make sure that it is valid da
 
 We should also check information about the dataset, to remove any null values from the dataset.
 
-|	recency	|history_segment|	history|	mens	|womens	|zip_code|	newbie|	channel|	segment|	visit	|conversion|	spend|
-|---|---|---|---|---|---|---|---|---|---|---|---|
+||	recency	|history_segment|	history|	mens	|womens	|zip_code|	newbie|	channel|	segment|	visit	|conversion|	spend|
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
 |count|	64000.000000	|64000	|64000.000000	|64000.000000	|64000.000000	|64000	|64000.000000|	64000|	64000|	64000.000000|	64000.000000	|64000.000000
 unique|	NaN|	7	|NaN	|NaN|	NaN	|3|	NaN|	3|	3|	NaN	|NaN|	NaN
 top|	NaN|	1)  0− 100	|NaN	|NaN|	NaN	|Surburban|	NaN	|Web|	Womens E-Mail|	NaN|	NaN|	NaN
