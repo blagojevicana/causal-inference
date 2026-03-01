@@ -210,7 +210,31 @@ For Mens email, the interval is approximately [0.006769, 0.006830]. Since zero i
 
 For Womens email, the interval is approximately [0.003207, 0.003281]. Since zero is not inside that interval, the effect is statistically significant.
 
-### 7. Conclusion
+### 7. Additional test: Does specifically targeting gender increase sales?
+
+Previously, we checked if an email (*Mens Email*, *Womens Email* or *No email*) would increase sales, but we didn't take into consideration what would happen if we targeted men with *Mens Email* and target women with *Womens Email*. Here, we will try to find the difference between sending *Mens Email* to everyone and sending *Mens Email* to only men, and same for women.
+
+Since we already have causal effects estimated, we will just use those numbers, and separate men and women customers. We get:
+```yaml
+Mens Email - Matched Effect: 0.006072948055047056
+Mens Email - Mismatched Effect: 0.005480054520602736
+Targeting Advantage (Mens Email): 0.0005928935344443201
+```
+```yaml
+Womens Email - Matched Effect: 0.005185158407971646
+Womens Email - Mismatched Effect: 0.0007736520400258007
+Targeting Advantage (Womens Email): 0.004411506367945845
+```
+
+Are these results statistically significant? Same as before, we will use bootstrapping and confidence intervals. We get:
+```yaml
+Mens Email Targeting 95% CI: [0.00055627 0.00062871]
+Womens Email Targeting 95% CI: [0.00434354 0.00447543]
+```
+
+Since CATE=0 is outside the interval, we conclude that the results are statistically significant, but they are very close to zero. It is important to note that emails are randomly sent without the regard of gender, and their response is artificialy simulated.
+
+### 8. Conclusion
 
 Sending the "Mens E-Mail" increased the probability of conversion by approximately 0.68% (or 0.0068) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.006769,0.006828]) does not include zero, indicating that this is a statistically significant and positive causal effect.
 
