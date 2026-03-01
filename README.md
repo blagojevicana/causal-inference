@@ -8,7 +8,7 @@ This is why causal inference is important. By looking at causal effect of sendin
 
 ### 2. Dataset
 
-This dataset is the famous marketing experiment from Kevin Hillstrom. It is commonly called the "Mine That Data Email Analytics Challenge".
+This dataset is the famous marketing experiment from Kevin Hillstrom. It is commonly called the "Mine That Data Email Analytics Challenge" from 2008.
 
 | |recency	|history_segment	|history|	mens	|womens|	zip_code|	newbie	|channel|	segment	|visit|	conversion|	spend|
 |---| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
