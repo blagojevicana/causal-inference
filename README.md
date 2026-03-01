@@ -169,7 +169,13 @@ Then **DRLearner** is created to estimate causal effect of treatment. DRLearner 
 Womens vs No Email: 0.0032445755243435356
 Mens vs No Email: 0.006799876534745651
 ```
-This method calculates difference between *Mens/Womens Email* and *No Email* for each customer (since for each customer we only know one outcome, the other is estimated), which is called **ITE (Individual Treatment Effect)**. Then, for their group of gender, we calculate the average of all ITEs and get **CATE (Conditional Average Treatment Effect)**. The result for Womens vs No Email is about 0.00324.That means sending the women’s email increases probability of conversion by 0.324 percentage points. For Mens vs No Email, the effect is 0.0068, which means a 0.68 percentage point increase.
+This method calculates difference between *Mens/Womens Email* and *No Email* for each customer (since for each customer we only know one outcome, the other is estimated), which is called **ITE (Individual Treatment Effect)**. Then, for their group of gender, we calculate the average of all ITEs and get **CATE (Conditional Average Treatment Effect)**.
+
+- If CATE > 0, it means the treatment increases the probability of conversion.
+- If CATE < 0, it means the treatment decreases the probability of conversion.
+- If CATE = 0, it means the treatment has no expected effect on that person.
+ 
+The result for Womens vs No Email is about 0.00324.That means sending the women’s email increases probability of conversion by 0.324 percentage points. For Mens vs No Email, the effect is 0.0068, which means a 0.68 percentage point increase.
 
 Next, let's check if the Individual Treatment Effect is the same for everyone (probably not, some customers are "immune"). Here is a histogram plot for men showing their response to receiving an email.
 
@@ -181,20 +187,28 @@ For women:
 
 ![Figure_4](figures/Figure_4.png)
 
+Now we need to estimate uncertainty around causal effect, and we do this by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. The 2.5th and 97.5th percentiles give a 95% confidence interval.
 
-Then bootstrap validation is performed.Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean.Doing this 1000 times creates a distribution of possible ATE values.The 2.5th and 97.5th percentiles give a 95% confidence interval.For Womens email, the interval is approximately [0.003207, 0.003281].Since zero is not inside that interval, the effect is statistically significant.The same is done for Mens email.
+![Figure_5](figures/Figure_5.png)
 
-Now comes the placebo test.The outcome Y is randomly shuffled.That destroys any real relationship between treatment and outcome.Then the DRLearner is fit again.If the method is valid, the estimated ATE should now be near zero.And it is.That shows the model is not just hallucinating effects.
+For Mens email, the interval is approximately [0.006769, 0.006830]. Since zero is not inside that interval, the effect is statistically significant.
+
+![Figure_6](figures/Figure_6.png)
+
+For Womens email, the interval is approximately [0.003207, 0.003281]. Since zero is not inside that interval, the effect is statistically significant.
+
 
 ### 6. Conclusion
 
-Mens email has a larger causal effect than Womens email.Both are statistically significant.The placebo confirms the method does not invent effects.The covariate balance confirms randomization.
+(Mens E-Mail - T=2): Effect: Sending the "Mens E-Mail" increased the probability of conversion by approximately 0.68% (or 0.0068) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.006769,0.006828]) does not include zero, indicating that this is a statistically significant and positive causal effect.
 
-The experiment was randomized.
-Groups are balanced.
-We estimated causal effects using a doubly robust machine learning method.
-Both email types increase conversion.
-Mens email increases conversion more.
+(Womens E-Mail - T=1): Effect: Sending the "Womens E-Mail" increased the probability of conversion by approximately 0.32% (or 0.0032) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.003204,0.003279]) does not include zero, also indicating a statistically significant and positive causal effect.
+
+1. The experiment was randomized.
+2. Groups are balanced.
+3. We estimated causal effects using a doubly robust machine learning method.
+4. Both email types increase conversion.
+5. Mens email increases conversion more.
 
 
 
