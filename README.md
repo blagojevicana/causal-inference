@@ -154,15 +154,33 @@ We can see that recency has a negative coefficient. That means customers who pur
 
 *Note: This regression is just descriptive, it is not causal yet, it just shows correlations between characteristics and outcome.*
 
+![Figure_2](figures/Figure_2.png)
+
 ### 5. Causal Machine Learning
 
-Two random forest models are defined.One is a classifier to estimate the propensity score. The propensity score is the probability of receiving treatment given covariates.The other is a regressor to estimate the outcome model. That means predicting conversion based on covariates and treatment.Then DRLearner is created.DRLearner stands for Doubly Robust Learner.It works like this.First, it estimates how treatment depends on covariates (propensity model).Second, it estimates how outcome depends on covariates and treatment (outcome model).Then it combines them in a special way that removes bias if at least one of those models is correctly specified.The “double robustness” means that even if one model is wrong, the causal estimate can still be correct as long as the other is correct.This method also uses cross-fitting. That means it splits the data, trains models on part of it, and evaluates on other parts. This prevents overfitting from contaminating the causal estimate.
+Two random forest models are defined:
 
-After fitting, the learner can estimate treatment effects.
+1. One is a classifier to estimate the propensity score. The propensity score is the probability of receiving treatment given covariates.
 
-For each customer, what is the estimated difference in probability of conversion between Womens E-Mail and No E-Mail? It computes an individual treatment effect for each person. That is called CATE (Conditional Average Treatment Effect).Then taking .mean() averages those individual effects. That gives the ATE (Average Treatment Effect).The result for Womens vs No Email is about 0.00324.That means sending the women’s email increases probability of conversion by 0.324 percentage points.For Mens vs No Email, the effect is 0.0068.That means a 0.68 percentage point increase.
+2. The other is a regressor to estimate the outcome model. That means predicting conversion based on covariates and treatment.
 
-Next, histograms are plotted of the CATE distribution.It shows that treatment effects are not identical for everyone.Some customers benefit more. Some benefit less. Some might even have negative effect.The red dashed line marks the average effect.The width of the histogram shows heterogeneity.
+Then **DRLearner** is created to estimate causal effect of treatment. DRLearner stands for *Doubly Robust Learner*. It works by combining two previously mention models, and if any of them are wrong the causal estimate can still be correct as long as the other is correct. This method also prevents overfitting by using cross validation (splits the data, trains models on part of it, and evaluates on other parts). The results are:
+```yaml
+Womens vs No Email: 0.0032445755243435356
+Mens vs No Email: 0.006799876534745651
+```
+This method calculates difference between *Mens/Womens Email* and *No Email* for each customer (since for each customer we only know one outcome, the other is estimated), which is called **ITE (Individual Treatment Effect)**. Then, for their group of gender, we calculate the average of all ITEs and get **CATE (Conditional Average Treatment Effect)**. The result for Womens vs No Email is about 0.00324.That means sending the women’s email increases probability of conversion by 0.324 percentage points. For Mens vs No Email, the effect is 0.0068, which means a 0.68 percentage point increase.
+
+Next, let's check if the Individual Treatment Effect is the same for everyone (probably not, some customers are "immune"). Here is a histogram plot for men showing their response to receiving an email.
+
+![Figure_3](figures/Figure_3.png)
+
+We can see that most of the male customers respond the same, but some don't.
+
+For women:
+
+![Figure_4](figures/Figure_4.png)
+
 
 Then bootstrap validation is performed.Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean.Doing this 1000 times creates a distribution of possible ATE values.The 2.5th and 97.5th percentiles give a 95% confidence interval.For Womens email, the interval is approximately [0.003207, 0.003281].Since zero is not inside that interval, the effect is statistically significant.The same is done for Mens email.
 
