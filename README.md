@@ -198,7 +198,7 @@ Hypothesis tetsing works by first setting up the hypotheses:
 
 It is possible that sending the email does something, but very rarely, in which case we would not have enough evidence to say H0 is false. We have to make sure that H1 is happening often enough that we can reject H0. We do this by calculating the **p-value**: *If H0 is true, how suprising is our data?*
 
-Since we only have one dataset, we will simulate different samples by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. Since we are using two-sided hypothesis, p-value is twice as big as in one-sided hypothesis, so we will use confidence intervals. The 2.5th and 97.5th percentiles give a 95% confidence interval.
+Since we only have one dataset, we will simulate different samples by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. Since we are using two-sided hypothesis, p-value is twice as big as in one-sided hypothesis, and it's harder to reject H0, so we will use confidence intervals. The 2.5th and 97.5th percentiles give a 95% confidence interval.
 
 0 is outside the 95% confidence interval ⇔ p-value < 0.05
 
@@ -212,9 +212,9 @@ For Womens email, the interval is approximately [0.003207, 0.003281]. Since zero
 
 ### 7. Conclusion
 
-(Mens E-Mail - T=2): Effect: Sending the "Mens E-Mail" increased the probability of conversion by approximately 0.68% (or 0.0068) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.006769,0.006828]) does not include zero, indicating that this is a statistically significant and positive causal effect.
+Sending the "Mens E-Mail" increased the probability of conversion by approximately 0.68% (or 0.0068) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.006769,0.006828]) does not include zero, indicating that this is a statistically significant and positive causal effect.
 
-(Womens E-Mail - T=1): Effect: Sending the "Womens E-Mail" increased the probability of conversion by approximately 0.32% (or 0.0032) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.003204,0.003279]) does not include zero, also indicating a statistically significant and positive causal effect.
+Sending the "Womens E-Mail" increased the probability of conversion by approximately 0.32% (or 0.0032) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.003204,0.003279]) does not include zero, also indicating a statistically significant and positive causal effect.
 
 1. The experiment was randomized.
 2. Groups are balanced.
