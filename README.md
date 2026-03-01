@@ -187,7 +187,20 @@ For women:
 
 ![Figure_4](figures/Figure_4.png)
 
-Now we need to estimate uncertainty around causal effect, and we do this by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. The 2.5th and 97.5th percentiles give a 95% confidence interval.
+### 6. Hypothesis testing
+
+Now we need to estimate uncertainty around causal effect. Are we certain that the causal effect is 0.0068 for Men and 0.0032 for Women, or could that be because of random noise in the data? We will do this by using **hypothesis testing**.
+
+Hypothesis tetsing works by first setting up the hypotheses:
+
+H0: ATE = 0 (sending the email does nothing)
+H1: ATE ≠ 0 (sending the email does something)
+
+It is possible that sending the email something does something, but very rarely, in which case we would not have enough evidence to say H0 is false. We have to make sure that H1 is happening often enough that we can reject H0. We do this by calculating the **p-value**: *If H0 is true, how suprising is our data?*
+
+Since we only have one dataset, we will simulate different samples by **bootstrapping**. Bootstrapping means repeatedly resampling the estimated individual effects with replacement and recomputing the mean. Doing this 1000 times creates a distribution of possible ATE values. The 2.5th and 97.5th percentiles give a 95% confidence interval.
+
+0 is outside the 95% confidence interval ⇔ p-value < 0.05
 
 ![Figure_5](figures/Figure_5.png)
 
@@ -197,8 +210,7 @@ For Mens email, the interval is approximately [0.006769, 0.006830]. Since zero i
 
 For Womens email, the interval is approximately [0.003207, 0.003281]. Since zero is not inside that interval, the effect is statistically significant.
 
-
-### 6. Conclusion
+### 7. Conclusion
 
 (Mens E-Mail - T=2): Effect: Sending the "Mens E-Mail" increased the probability of conversion by approximately 0.68% (or 0.0068) compared to the control group. Significance: The 95% confidence interval for the ATE ([0.006769,0.006828]) does not include zero, indicating that this is a statistically significant and positive causal effect.
 
